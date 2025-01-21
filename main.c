@@ -1,4 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <editline/readline.h>
+#include <editline/history.h>
+
 
 #define MAXIMUM_SIZE 2048
 
@@ -11,10 +15,12 @@ int main(int arg, char**argv)
 
     while(1) 
     {
-        fputs("lispc> ", stdout); /*prompt output */
-        fgets(input, MAXIMUM_SIZE, stdin); /* read input */
+        char* input = readline("lispc> ");
+        add_history(input); /*add input to history-> accessed by pressing the arrow key*/
 
-        printf("No you're a %s", input);
+        printf("No you're a %s\n", input);
+
+        free(input);
     }
     return 0;
 }
