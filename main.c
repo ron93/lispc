@@ -1,12 +1,32 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define MAXIMUM_BUFFER_SIZE 2048
+/* compile this functions if on  windows*/
+#ifdef _WIN32
+#include <string.h>
+
+
+static char buffer[MAXIMUM_SIZE]; /* bufer to hold user input of size 2048 */
+
+/* fake readline function */
+char* readline(char* prompt)
+{
+    fputs(promt, stdout);
+    fgets(buffer, MAXIMUM_BUFFER_SIZE);
+    char* cpy = malloc(strlen(buffer)+1);
+    strcpy(cpy, buffer);
+    cpy[strlen(cpy)-1] = '\0';
+    return cpy;
+}
+
+/* fake history function */
+void add_history(char* unused) {}
+
+/* run this function otherwise*/
+#else
 #include <editline/readline.h>
 #include <editline/history.h>
-
-
-#define MAXIMUM_SIZE 2048
-
-static char input[MAXIMUM_SIZE]; /* bufer to hold user input of size 2048 */
+#endif
 
 int main(int arg, char**argv)
 {
