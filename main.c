@@ -28,6 +28,36 @@ void add_history(char* unused) {}
 #include <editline/history.h>
 #endif
 
+/* use operator string to see which operation to perform */
+long eval_op(long x, char* op, long y) {
+    if (strcmp(op, "+") == 0) { return x + y;}
+    if (strcmp(op, "-") == 0) { return x - y;}
+    if (strcmp(op, "*") == 0) { return x * y;}
+    if (strcmp(op, "+") == 0) { return x / y;}
+    return 0;
+}
+long eval(mpc_ast_t* t) {
+    /* if tagged as a number return it directly */
+    if (strstr(t->tag, "number")) {
+        return atoi(t->contents);
+    }
+    /* the operator is always the second child */
+    char* op = t-> children[1]->contents;
+
+    /* store 3rd child in x */
+    long x = eval(t-> children[2]);
+
+    /* iterate the remaining children and combining */
+    int i = 3;
+    while (strstr(t->children[i]->tag, "expr")) {
+        x = eval_op(x, op, eval(t->children[i]));
+        i++;
+    }
+    return x;
+}
+
+
+
 int main(int arg, char**argv)
 {
     /* Parsers*/
@@ -57,9 +87,23 @@ int main(int arg, char**argv)
         /* parse input*/
         mpc_result_t r;
         if (mpc_parse("<stdin>", input, Lispc, &r)) {
+            /*  Load AST from output */
+            mpc_ast_t* a = r.output;
+            // printf("Tag: %s\n", a->tag);
+            // printf("Contents: %s\n", a->contents);
+            // printf("NUmber of children: %i\n", a->children_num);
+
+            // /* Get first child */
+            // mpc_ast_t* c0 = a->children[0];
+            // printf("First child Tag: %s\n", c0->tag);
+            // printf("First child Contents: %s\n", c0->contents);
+            // printf("First child Number of children: %i\n", c0->children_num);
+            
+            long result = eval(a);
+            printf("%li\n", result);
             /* print and delete AST*/
-            mpc_ast_print(r.output);
-            mpc_ast_delete(r.output);
+            // mpc_ast_print(a);
+            mpc_ast_delete(a);
         } 
         else {
             mpc_err_print(r.error);
