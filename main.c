@@ -28,24 +28,87 @@ void add_history(char* unused) {}
 #include <editline/history.h>
 #endif
 
-/* use operator string to see which operation to perform */
-long eval_op(long x, char* op, long y) {
-    if (strcmp(op, "+") == 0) { return x + y;}
-    if (strcmp(op, "-") == 0) { return x - y;}
-    if (strcmp(op, "*") == 0) { return x * y;}
-    if (strcmp(op, "+") == 0) { return x / y;}
-    return 0;
+/* lval(lispc values) type*/
+typedef struct
+{
+    int type;
+    long num;
+    int err;
+} lval;
+
+/* possible lval types*/
+enum { LVAL_NUM, LVAL_ERR};
+/* possible errors*/
+enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
+
+/* create a new number type lval*/
+lval lval_num(long x) {
+    lval v;
+    v.type = LVAL_NUM;
+    v.num = x;
+    return v;
 }
-long eval(mpc_ast_t* t) {
+/* create a new error type lval*/
+lval lval_err(int x) {
+    lval v;
+    v.type = LVAL_ERR;
+    v.err = x;
+    return v;
+}
+
+/* print lval */
+void lval_print(lval v) {
+    switch (v.type) {
+        /* print if type is number*/
+        case LVAL_NUM: printf("%li", v.num); break;
+
+        /* error type */
+        case LVAL_ERR:
+            /* check type of error and print */
+            if (v.err == LERR_DIV_ZERO) {
+                printf("Error: Division by zero!");
+            }   
+            if (v.err == LERR_BAD_OP) {
+                printf("Error: Invalid operator!");
+            }
+            if (v.err == LERR_BAD_NUM) {
+                printf("Error: Invalid number!");
+            }
+        break;
+    }
+}
+
+/* print lval followed by a newline */
+void lval_println(lval v) { lval_print(v); putchar('\n');}
+
+/* use operator string to see which operation to perform */
+lval eval_op(lval x, char* op, lval y) {
+
+    /* check if value id error and return it */
+    if (x.type == LVAL_ERR) { return x; }
+    if (y.type == LVAL_ERR) { return y; }
+
+    if (strcmp(op, "+") == 0) { lval_num(x.num + y.num);}
+    if (strcmp(op, "-") == 0) { lval_num(x.num - y.num);}
+    if (strcmp(op, "*") == 0) { lval_num(x.num * y.num);}
+    if (strcmp(op, "/") == 0) { 
+    /* if second operand is 0 return error*/
+        return y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num); 
+    }
+    return lval_err(LERR_BAD_OP);
+}
+lval eval(mpc_ast_t* t) {
     /* if tagged as a number return it directly */
     if (strstr(t->tag, "number")) {
-        return atoi(t->contents);
+        /* check for error in conversion */
+        errno = 0;
+        long x = strtol(t->contents, NULL, 10);
+        return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
     }
     /* the operator is always the second child */
     char* op = t-> children[1]->contents;
-
     /* store 3rd child in x */
-    long x = eval(t-> children[2]);
+    lval x = eval(t-> children[2]);
 
     /* iterate the remaining children and combining */
     int i = 3;
@@ -98,9 +161,11 @@ int main(int arg, char**argv)
             // printf("First child Tag: %s\n", c0->tag);
             // printf("First child Contents: %s\n", c0->contents);
             // printf("First child Number of children: %i\n", c0->children_num);
+            // printf("children: %s\n", c0->children[0]);
+
             
-            long result = eval(a);
-            printf("%li\n", result);
+            lval result = eval(a);
+            lval_println(result);
             /* print and delete AST*/
             // mpc_ast_print(a);
             mpc_ast_delete(a);
