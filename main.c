@@ -38,6 +38,7 @@ typedef struct
 
 /* possible lval types*/
 enum { LVAL_NUM, LVAL_ERR};
+
 /* possible errors*/
 enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
 
@@ -66,13 +67,13 @@ void lval_print(lval v) {
         case LVAL_ERR:
             /* check type of error and print */
             if (v.err == LERR_DIV_ZERO) {
-                printf("Error: Division by zero!");
+                printf("Error: Division by Zero!");
             }   
             if (v.err == LERR_BAD_OP) {
-                printf("Error: Invalid operator!");
+                printf("Error: Invalid Operator!");
             }
             if (v.err == LERR_BAD_NUM) {
-                printf("Error: Invalid number!");
+                printf("Error: Invalid Number!");
             }
         break;
     }
@@ -88,9 +89,9 @@ lval eval_op(lval x, char* op, lval y) {
     if (x.type == LVAL_ERR) { return x; }
     if (y.type == LVAL_ERR) { return y; }
 
-    if (strcmp(op, "+") == 0) { lval_num(x.num + y.num);}
-    if (strcmp(op, "-") == 0) { lval_num(x.num - y.num);}
-    if (strcmp(op, "*") == 0) { lval_num(x.num * y.num);}
+    if (strcmp(op, "+") == 0) { return lval_num(x.num + y.num); }
+    if (strcmp(op, "-") == 0) { return lval_num(x.num - y.num); }
+    if (strcmp(op, "*") == 0) { return lval_num(x.num * y.num); }
     if (strcmp(op, "/") == 0) { 
     /* if second operand is 0 return error*/
         return y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num); 
