@@ -33,14 +33,20 @@ typedef struct
 {
     int type;
     long num;
-    int err;
+    /* error and symbol have string data*/
+    char* err;
+    char* sym;
+    /* count to aa list of "lval*" */
+    int count;
+    /* Pointer to a list of "lval*" */
+    struct  lval** cell;
 } lval;
 
 /* possible lval types*/
-enum { LVAL_NUM, LVAL_ERR};
+enum { LVAL_NUM, LVAL_ERR, LVAL_SYM, LVAL_SEXPR };
 
 /* possible errors*/
-enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
+// enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
 
 /* create a new number type lval*/
 lval lval_num(long x) {
