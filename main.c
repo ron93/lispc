@@ -49,10 +49,10 @@ enum { LVAL_NUM, LVAL_ERR, LVAL_SYM, LVAL_SEXPR };
 // enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
 
 /* create a new number type lval*/
-lval lval_num(long x) {
-    lval v;
-    v.type = LVAL_NUM;
-    v.num = x;
+lval* lval_num(long x) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_NUM;
+    v->num = x;
     return v;
 }
 /* create a new error type lval*/
