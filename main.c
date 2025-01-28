@@ -43,19 +43,20 @@ typedef struct
 } lval;
 
 /* possible lval types*/
-enum { LVAL_NUM, LVAL_ERR, LVAL_SYM, LVAL_SEXPR };
-
+enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR };
+void lval_print(lval* v);
+lval* lval_add(lval* v, lval* x);
 /* possible errors*/
 // enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
 
-/* create a pointer to a new number type lval*/
+/* construct a pointer to a new number type lval*/
 lval* lval_num(long x) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_NUM;
     v->num = x;
     return v;
 }
-/* create a pointer to a new error type lval*/
+/* construct a pointer to a new error type lval*/
 lval* lval_err(char* m) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_ERR;
@@ -64,8 +65,8 @@ lval* lval_err(char* m) {
     return v;
 }
 
-/* create a pointer to a new Symbol lval*/
-lval* lval_sym(char * s) {
+/* construct a pointer to a new Symbol lval*/
+lval* lval_sym(char* s) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_SYM;
     v->sym = malloc(strlen(s) + 1); /* allocate space for symbol :strlen(s) + 1 -> to add space for the end of string char '\0'*/
@@ -111,9 +112,10 @@ lval* lval_read_num(mpc_ast_t* t) {
     return errno != ERANGE ? lval_num(x) : lval_err("invalid number");
 }
 
+
 lval* lval_read(mpc_ast_t* t) {
     /* check value and convert to target type */
-    if (strstr(t->tag, "number")) { return lval_read_num(t);}
+    if (strstr(t->tag, "number")) { return lval_read_num(t); }
     if (strstr(t->tag, "symbol")) { return lval_sym(t->contents); }
 
     /* if root(>) or sexpr create empty list */
@@ -169,42 +171,42 @@ void lval_print(lval* v) {
 void lval_println(lval* v) { lval_print(v); putchar('\n');}
 
 /* use operator string to see which operation to perform */
-lval eval_op(lval x, char* op, lval y) {
+// lval eval_op(lval x, char* op, lval y) {
 
-    /* check if value id error and return it */
-    if (x.type == LVAL_ERR) { return x; }
-    if (y.type == LVAL_ERR) { return y; }
+//     /* check if value id error and return it */
+//     if (x.type == LVAL_ERR) { return x; }
+//     if (y.type == LVAL_ERR) { return y; }
 
-    if (strcmp(op, "+") == 0) { return lval_num(x.num + y.num); }
-    if (strcmp(op, "-") == 0) { return lval_num(x.num - y.num); }
-    if (strcmp(op, "*") == 0) { return lval_num(x.num * y.num); }
-    if (strcmp(op, "/") == 0) { 
-    /* if second operand is 0 return error*/
-        return y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num); 
-    }
-    return lval_err(LERR_BAD_OP);
-}
-lval eval(mpc_ast_t* t) {
-    /* if tagged as a number return it directly */
-    if (strstr(t->tag, "number")) {
-        /* check for error in conversion */
-        errno = 0;
-        long x = strtol(t->contents, NULL, 10);
-        return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
-    }
-    /* the operator is always the second child */
-    char* op = t-> children[1]->contents;
-    /* store 3rd child in x */
-    lval x = eval(t-> children[2]);
+//     if (strcmp(op, "+") == 0) { return lval_num(x.num + y.num); }
+//     if (strcmp(op, "-") == 0) { return lval_num(x.num - y.num); }
+//     if (strcmp(op, "*") == 0) { return lval_num(x.num * y.num); }
+//     if (strcmp(op, "/") == 0) { 
+//     /* if second operand is 0 return error*/
+//         return y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num); 
+//     }
+//     return lval_err(LERR_BAD_OP);
+// }
+// lval eval(mpc_ast_t* t) {
+//     /* if tagged as a number return it directly */
+//     if (strstr(t->tag, "number")) {
+//         /* check for error in conversion */
+//         errno = 0;
+//         long x = strtol(t->contents, NULL, 10);
+//         return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
+//     }
+//     /* the operator is always the second child */
+//     char* op = t-> children[1]->contents;
+//     /* store 3rd child in x */
+//     lval x = eval(t-> children[2]);
 
-    /* iterate the remaining children and combining */
-    int i = 3;
-    while (strstr(t->children[i]->tag, "expr")) {
-        x = eval_op(x, op, eval(t->children[i]));
-        i++;
-    }
-    return x;
-}
+//     /* iterate the remaining children and combining */
+//     int i = 3;
+//     while (strstr(t->children[i]->tag, "expr")) {
+//         x = eval_op(x, op, eval(t->children[i]));
+//         i++;
+//     }
+//     return x;
+// }
 
 
 
@@ -219,12 +221,12 @@ int main(int arg, char**argv)
 
     /* define language*/
     mpca_lang(MPCA_LANG_DEFAULT, 
-        "                                                     \
-            number   : /-?[0-9]+/ ;                             \
-            symbol   : '+' | '-' | '*' | '/' ;                  \
-            sexpr    : '(' <expr>* ')' ; \
-            expr     : <number> | symbol | <sexpr> ;  \
-            lispc    : /^/ <expr>+ /$/ ;             \
+        "                                          \
+            number : /-?[0-9]+/ ;                    \
+            symbol : '+' | '-' | '*' | '/' ;         \
+            sexpr  : '(' <expr>* ')' ;               \
+            expr   : <number> | <symbol> | <sexpr> ; \
+            lispc  : /^/ <expr>* /$/ ;               \
         ",
         Number, Symbol, Sexpr, Expr, Lispc);
 
@@ -241,23 +243,15 @@ int main(int arg, char**argv)
         if (mpc_parse("<stdin>", input, Lispc, &r)) {
             /*  Load AST from output */
             mpc_ast_t* a = r.output;
-            // printf("Tag: %s\n", a->tag);
-            // printf("Contents: %s\n", a->contents);
-            // printf("NUmber of children: %i\n", a->children_num);
-
-            // /* Get first child */
-            // mpc_ast_t* c0 = a->children[0];
-            // printf("First child Tag: %s\n", c0->tag);
-            // printf("First child Contents: %s\n", c0->contents);
-            // printf("First child Number of children: %i\n", c0->children_num);
-            // printf("children: %s\n", c0->children[0]);
-
-            
-            lval result = eval(a);
-            lval_println(result);
+        
+            // lval result = eval(a);
+            // lval_println(result);
             /* print and delete AST*/
             // mpc_ast_print(a);
-            mpc_ast_delete(a);
+            // mpc_ast_delete(a);
+            lval* x = lval_read(a);
+            lval_println(x);
+            lval_del(x);
         } 
         else {
             mpc_err_print(r.error);
