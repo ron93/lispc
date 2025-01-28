@@ -72,7 +72,14 @@ lval* lval_sym(char * s) {
     return v;
 }
 
-/*  */
+/*  A pointer to a new empty Sexpr lval*/
+lval* lval_sexpr(void) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_SEXPR;
+    v->count = 0;
+    v->cell = NULL;
+    return v;
+}
 
 /* print lval */
 void lval_print(lval v) {
