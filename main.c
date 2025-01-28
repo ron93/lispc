@@ -82,6 +82,28 @@ lval* lval_sexpr(void) {
     return v;
 }
 
+void lval_del(lval* v) {
+    switch ( v->type)
+    {
+        /* Do nothing for number type*/
+        case LVAL_NUM: break;
+
+        /* free string -> Err and Sym*/
+        case LVAL_ERR: free(v->err); break;
+        case LVAL_SYM: free(v->sym); break;
+
+        /* Sexpr handling*/
+        case LVAL_SEXPR:
+            for (int i = 0; i < v->count; i++) {
+                /* delete every element in an Sexpr i.e use recussion because every value of Sexpr can be either a Sym or Err*/
+                lval_del(v->cell[i]);
+            }
+            /* free pointer memory */
+            free(v->cell);
+        break;
+    }
+    free(v);
+}
 /* print lval */
 void lval_print(lval v) {
     switch (v.type) {
