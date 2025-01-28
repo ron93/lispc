@@ -56,10 +56,11 @@ lval* lval_num(long x) {
     return v;
 }
 /* create a pointer to a new error type lval*/
-lval* lval_err(int x) {
+lval* lval_err(int m) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_ERR;
-    v->err = x;
+    v->err = malloc(sizeof(m) + 1);
+    strcpy(v->err, m);
     return v;
 }
 
@@ -67,7 +68,7 @@ lval* lval_err(int x) {
 lval* lval_sym(char * s) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_SYM;
-    v->sym = malloc(strlen(s) + 1);
+    v->sym = malloc(strlen(s) + 1); /* allocate space for symbol :strlen(s) + 1 -> to add space for the end of string char '\0'*/
     strcpy(v->sym, s);
     return v;
 }
