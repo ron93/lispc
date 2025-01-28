@@ -63,6 +63,17 @@ lval* lval_err(int x) {
     return v;
 }
 
+/* create a pointer to a new Symbol lval*/
+lval* lval_sym(char * s) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_SYM;
+    v->sym = malloc(strlen(s) + 1);
+    strcpy(v->sym, s);
+    return v;
+}
+
+/*  */
+
 /* print lval */
 void lval_print(lval v) {
     switch (v.type) {
