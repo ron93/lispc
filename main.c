@@ -38,9 +38,13 @@ typedef struct
     char* sym;
     /* count to aa list of "lval*" */
     int count;
-    /* Pointer to a list of "lval*" */
-    struct  lval** cell;
+    /* Pointer to a list of "lval*" -> converted from 'struct lval** cell' type declaration*/
+    lval** cell;
 } lval;
+
+/* to fix pointer or reference to incomplete type "struct lval" is not allowed
+*/
+typedef struct cell;
 
 /* possible lval types*/
 enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR };
@@ -209,6 +213,43 @@ void lval_println(lval* v) { lval_print(v); putchar('\n');}
 // }
 
 
+
+lval* lval_eval_sexpr(lval* v) {
+    /* evaluate children */
+    for (int i = 0; i < v->count; i++) {
+        v->cell[i] = lval_eval(v->cell[i]);
+    }
+    /* error check */
+    for (int i = 0; i < v->count; i++) {
+        if (v->cell[i]->type == LVAL_ERR) {return lval_take(v, i); }
+    }
+    /* empty Expression*/
+    if (v->count == 0) { return v; }
+
+    /* single Expression */
+    if (v->count == 1) { return lval_take(v, 0); }
+
+
+    /* Ensure first element is a Symbol */
+    lval* f = lval_pop(v, 0);
+    if (f->type != LVAL_SYM) {
+        lval_del(f); lval_del(v);
+        return lval_err("S-expression Does not start with sumbol!");
+    }
+
+    /* Call builtin with operator */
+    lval* result = builtin_op(v, f->sym);
+    lval_del(f);
+    return result;
+}
+
+lval* lval_eval(lval* v) {
+    /* evaluate Sexpression */
+    if (v->type == LVAL_SEXPR) { return lval_eval_sexpr(v); }
+
+    /* all other lval types remain the same */
+    return v;
+}
 
 int main(int arg, char**argv)
 {
