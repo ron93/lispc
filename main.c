@@ -56,6 +56,7 @@ lval* lval_add(lval* v, lval* x);
 lval* lval_eval(lval* v);
 lval* lval_take(lval* v, int i);
 lval* lval_pop(lval* v, int i);
+lval* builtin_op(lval* a, char* op);
 
 /* possible errors*/
 // enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
@@ -271,6 +272,44 @@ lval* lval_take(lval* v, int i) {
     lval_del(v);
     return x;
 }
+
+lval* builtin_op(lval* a, char* op) {
+    // ensure all args are numbers 
+    for (int i = 0; i < a->count; i++) {
+        if (a->cell[i]->type != LVAL_NUM) {
+            lval_del(a);
+            return lval_err("Cannot operate on no-number!");
+        }
+    }
+
+    // pop first element
+    lval* x = lval_pop(a, 0);
+
+    // if no args and sub , perform unary negation
+    if ((strcmp(op, "-") == 0) && a->count == 0) {
+        x->num = -x->num;
+    }
+
+    // while elements stil in list
+    while (a->count > 0) {
+        // pop next element
+        lval* y = lval_pop(a, 0);
+
+        if (strcmp(op, "+") == 0) { x->num += y->num; }
+        if (strcmp(op, "-") == 0) { x->num -= y->num; }
+        if (strcmp(op, "*") == 0) { x->num *= y->num; }
+        if (strcmp(op, "/") == 0) { 
+            if (y->num == 0) {
+                lval_del(x); lval_del(y);
+                x = lval_err("Division by zero!"); break;
+            }
+            x->num /= y->num;
+         }
+         lval_del(y);
+    }
+    lval_del(a); return x;
+}
+
 
 int main(int arg, char**argv)
 {
