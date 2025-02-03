@@ -28,28 +28,30 @@ void add_history(char* unused) {}
 #include <editline/history.h>
 #endif
 
+/* to fix pointer or reference to incomplete type "struct lval" is not allowed
+*/
+typedef struct cell;
 /* lval(lispc values) type*/
-typedef struct
+typedef struct lval
 {
     int type;
     long num;
     /* error and symbol have string data*/
     char* err;
     char* sym;
-    /* count to aa list of "lval*" */
+    /* count */
     int count;
     /* Pointer to a list of "lval*" -> converted from 'struct lval** cell' type declaration*/
     lval** cell;
 } lval;
 
-/* to fix pointer or reference to incomplete type "struct lval" is not allowed
-*/
-typedef struct cell;
+
 
 /* possible lval types*/
 enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR };
 void lval_print(lval* v);
 lval* lval_add(lval* v, lval* x);
+lval* lval_eval(lval* v);
 /* possible errors*/
 // enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
 
@@ -250,6 +252,15 @@ lval* lval_eval(lval* v) {
     /* all other lval types remain the same */
     return v;
 }
+
+lval* lval_pop(lval* v, int i) {
+    // find the item at "i"
+    lval* x = v->cell[i];
+
+    // shift memory after the item at "i" over the top
+    memmove(&v->cell[i], &v->cell[i+1], sizeof(lval*) * (v->count-i-1));
+}
+
 
 int main(int arg, char**argv)
 {
