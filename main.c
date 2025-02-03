@@ -96,7 +96,7 @@ lval* lval_sexpr(void) {
 }
 
 void lval_del(lval* v) {
-    switch ( v->type)
+    switch (v->type)
     {
         /* Do nothing for number type*/
         case LVAL_NUM: break;
@@ -265,6 +265,13 @@ lval* lval_pop(lval* v, int i) {
 
     // shift memory after the item at "i" over the top
     memmove(&v->cell[i], &v->cell[i+1], sizeof(lval*) * (v->count-i-1));
+
+    // decrease count of items in the list
+    v->count--;
+
+    // reallocate memory used 
+    v->cell = realloc(v->cell, sizeof(lval*) * v->count);
+    return x;
 }
 
 lval* lval_take(lval* v, int i) {
@@ -344,13 +351,7 @@ int main(int arg, char**argv)
         if (mpc_parse("<stdin>", input, Lispc, &r)) {
             /*  Load AST from output */
             mpc_ast_t* a = r.output;
-        
-            // lval result = eval(a);
-            // lval_println(result);
-            /* print and delete AST*/
-            // mpc_ast_print(a);
-            // mpc_ast_delete(a);
-            lval* x = lval_read(a);
+            lval* x = lval_eval(lval_read(a));
             lval_println(x);
             lval_del(x);
         } 
