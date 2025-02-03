@@ -30,7 +30,7 @@ void add_history(char* unused) {}
 
 /* to fix pointer or reference to incomplete type "struct lval" is not allowed
 */
-typedef struct cell;
+// typedef struct cell;
 /* lval(lispc values) type*/
 typedef struct lval
 {
@@ -42,16 +42,21 @@ typedef struct lval
     /* count */
     int count;
     /* Pointer to a list of "lval*" -> converted from 'struct lval** cell' type declaration*/
-    lval** cell;
+    struct lval** cell;
 } lval;
 
 
 
 /* possible lval types*/
 enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR };
+
+// foward declaration
 void lval_print(lval* v);
 lval* lval_add(lval* v, lval* x);
 lval* lval_eval(lval* v);
+lval* lval_take(lval* v, int i);
+lval* lval_pop(lval* v, int i);
+
 /* possible errors*/
 // enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
 
@@ -236,7 +241,7 @@ lval* lval_eval_sexpr(lval* v) {
     lval* f = lval_pop(v, 0);
     if (f->type != LVAL_SYM) {
         lval_del(f); lval_del(v);
-        return lval_err("S-expression Does not start with sumbol!");
+        return lval_err("S-expression Does not start with symbol!");
     }
 
     /* Call builtin with operator */
@@ -261,6 +266,11 @@ lval* lval_pop(lval* v, int i) {
     memmove(&v->cell[i], &v->cell[i+1], sizeof(lval*) * (v->count-i-1));
 }
 
+lval* lval_take(lval* v, int i) {
+    lval* x = lval_pop(v, i);
+    lval_del(v);
+    return x;
+}
 
 int main(int arg, char**argv)
 {
