@@ -103,30 +103,6 @@ lval* lval_qexpr(void) {
     return v;
 }
 
-void lval_del(lval* v) {
-    switch (v->type)
-    {
-        /* Do nothing for number type*/
-        case LVAL_NUM: break;
-
-        /* free string -> Err and Sym*/
-        case LVAL_ERR: free(v->err); break;
-        case LVAL_SYM: free(v->sym); break;
-
-        /* Sexpr and Qexpr handling ->delete if either*/
-        case LVAL_QEXPR:
-        case LVAL_SEXPR:
-            for (int i = 0; i < v->count; i++) {
-                /* delete every element in an Sexpr i.e use recussion because every value of Sexpr can be either a Sym or Err*/
-                lval_del(v->cell[i]);
-            }
-            /* free pointer memory */
-            free(v->cell);
-        break;
-    }
-    free(v);
-}
-
 lval* lval_read_num(mpc_ast_t* t) {
     errno = 0;
     long x = strtol(t->contents, NULL, 10);
@@ -173,6 +149,31 @@ void lval_expr_print(lval* v, char open, char close) {
         }
     }
     putchar(close);
+}
+
+// delete logic
+void lval_del(lval* v) {
+    switch (v->type)
+    {
+        /* Do nothing for number type*/
+        case LVAL_NUM: break;
+
+        /* free string -> Err and Sym*/
+        case LVAL_ERR: free(v->err); break;
+        case LVAL_SYM: free(v->sym); break;
+
+        /* Sexpr and Qexpr handling ->delete if either*/
+        case LVAL_QEXPR:
+        case LVAL_SEXPR:
+            for (int i = 0; i < v->count; i++) {
+                /* delete every element in an Sexpr i.e use recussion because every value of Sexpr can be either a Sym or Err*/
+                lval_del(v->cell[i]);
+            }
+            /* free pointer memory */
+            free(v->cell);
+        break;
+    }
+    free(v);
 }
 
 /* print lval */
