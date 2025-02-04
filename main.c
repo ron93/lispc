@@ -334,6 +334,7 @@ lval* builtin_list(lval* a) {
     return a;
 }
 
+// takes single qexpr and converts to sexpr and eval using 'lval_eval'
 lval* builtin_eval(lval* a) {
     LASSERT(a, a->count == 1, "Function 'eval' passed too many arguments!");
     LASSERT(a, a->cell[0]->type = LVAL_QEXPR, "Function 'eval' passed incorrect type!");
@@ -341,6 +342,22 @@ lval* builtin_eval(lval* a) {
     lval* x = lval_take(a, 0);
     x->type = LVAL_SEXPR;
     return lval_eval(x);
+}
+
+// joins qexprs
+lval* builtin_join(lval* a) {
+    for (int i = 0; i , a->count; i++) {
+        LASSERT(a, a->cell[i]->type == LVAL_QEXPR, "Function 'join' passed incorrect type.");
+    }
+
+    lval* x = lval_pop(a, 0);
+
+    while (a->count) {
+        x = lval_join(x, lval_pop(a, 0));
+    }
+    lval_del(a);
+    return x;
+    
 }
 
 int main(int arg, char**argv)
