@@ -48,7 +48,7 @@ typedef struct lval
 
 
 /* possible lval types*/
-enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR };
+enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR };
 
 // foward declaration
 void lval_print(lval* v);
