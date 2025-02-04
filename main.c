@@ -182,46 +182,6 @@ void lval_print(lval* v) {
 /* print lval followed by a newline */
 void lval_println(lval* v) { lval_print(v); putchar('\n');}
 
-/* use operator string to see which operation to perform */
-// lval eval_op(lval x, char* op, lval y) {
-
-//     /* check if value id error and return it */
-//     if (x.type == LVAL_ERR) { return x; }
-//     if (y.type == LVAL_ERR) { return y; }
-
-//     if (strcmp(op, "+") == 0) { return lval_num(x.num + y.num); }
-//     if (strcmp(op, "-") == 0) { return lval_num(x.num - y.num); }
-//     if (strcmp(op, "*") == 0) { return lval_num(x.num * y.num); }
-//     if (strcmp(op, "/") == 0) { 
-//     /* if second operand is 0 return error*/
-//         return y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num); 
-//     }
-//     return lval_err(LERR_BAD_OP);
-// }
-// lval eval(mpc_ast_t* t) {
-//     /* if tagged as a number return it directly */
-//     if (strstr(t->tag, "number")) {
-//         /* check for error in conversion */
-//         errno = 0;
-//         long x = strtol(t->contents, NULL, 10);
-//         return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
-//     }
-//     /* the operator is always the second child */
-//     char* op = t-> children[1]->contents;
-//     /* store 3rd child in x */
-//     lval x = eval(t-> children[2]);
-
-//     /* iterate the remaining children and combining */
-//     int i = 3;
-//     while (strstr(t->children[i]->tag, "expr")) {
-//         x = eval_op(x, op, eval(t->children[i]));
-//         i++;
-//     }
-//     return x;
-// }
-
-
-
 lval* lval_eval_sexpr(lval* v) {
     /* evaluate children */
     for (int i = 0; i < v->count; i++) {
