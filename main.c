@@ -284,19 +284,21 @@ int main(int arg, char**argv)
     mpc_parser_t* Number = mpc_new("number");
     mpc_parser_t* Symbol = mpc_new("symbol");
     mpc_parser_t* Sexpr = mpc_new("sexpr");
+    mpc_parser_t* Qexpr = mpc_new("qexpr");
     mpc_parser_t* Expr = mpc_new("expr");
     mpc_parser_t* Lispc = mpc_new("lispc");
 
     /* define language*/
     mpca_lang(MPCA_LANG_DEFAULT, 
-        "                                          \
+        "                                            \
             number : /-?[0-9]+/ ;                    \
             symbol : '+' | '-' | '*' | '/' ;         \
             sexpr  : '(' <expr>* ')' ;               \
+            qexpr  :  '{' <expr>* '}'  ;             \
             expr   : <number> | <symbol> | <sexpr> ; \
             lispc  : /^/ <expr>* /$/ ;               \
         ",
-        Number, Symbol, Sexpr, Expr, Lispc);
+        Number, Symbol, Sexpr,Qexpr, Expr, Lispc);
 
     puts("lispc version 0.0.0.0.1"); /* version info */
     puts("Press ctrl+c to exit\n");
@@ -322,6 +324,6 @@ int main(int arg, char**argv)
 
         free(input);
     }
-    mpc_cleanup(5, Number, Symbol, Sexpr, Expr, Lispc);
+    mpc_cleanup(6, Number, Symbol, Sexpr, Qexpr, Expr, Lispc);
     return 0;
 }
