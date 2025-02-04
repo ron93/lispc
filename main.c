@@ -113,7 +113,8 @@ void lval_del(lval* v) {
         case LVAL_ERR: free(v->err); break;
         case LVAL_SYM: free(v->sym); break;
 
-        /* Sexpr handling*/
+        /* Sexpr and Qexpr handling ->delete if either*/
+        case LVAL_QEXPR:
         case LVAL_SEXPR:
             for (int i = 0; i < v->count; i++) {
                 /* delete every element in an Sexpr i.e use recussion because every value of Sexpr can be either a Sym or Err*/
