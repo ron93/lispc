@@ -1,6 +1,11 @@
 #include  "mpc.h"
 
 #define MAXIMUM_BUFFER_SIZE 2048
+
+#define LASSERT(args, cond, err) \
+    if(!(cond)) { lval_del(args); return lval_err(err); }
+
+    
 /* compile this functions if on  windows*/
 #ifdef _WIN32
 #include <string.h>
