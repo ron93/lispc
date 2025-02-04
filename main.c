@@ -314,20 +314,11 @@ lval* builtin_head(lval* a) {
 
 lval* builtin_tail(lval* a) {
     // check Error conditions
-    if (a->count != 1) {
-        lval_del(a);
-        return lval_err("Functon 'tail' passed too many arguments!");
-    }
+    LASSERT(a, a->count != 1, "Functon 'tail' passed too many arguments!");
 
-    if (a->cell[0]->type != LVAL_QEXPR) {
-        lval_del(a);
-        return lval_err("Function 'tail' passed incorrect types!");
-    }
+    LASSERT(a, a->cell[0]->type != LVAL_QEXPR, "Function 'tail' passed incorrect types!"); 
 
-    if (a->cell[0]->count == 0) {
-        lval_del(a);
-        return lval_err("Function 'tail' passed {}");
-    }
+    LASSERT(a, a->cell[0]->count == 0, "Function 'tail' passed {}");
 
     // take first argument
     lval* v = lval_take(a, 0);
@@ -337,6 +328,10 @@ lval* builtin_tail(lval* a) {
     return v;
 }
 
+lval* builtin_list(lval* a) {
+    a->type = LVAL_QEXPR;
+    return a;
+}
 
 int main(int arg, char**argv)
 {
