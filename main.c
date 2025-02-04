@@ -62,6 +62,7 @@ lval* lval_eval(lval* v);
 lval* lval_take(lval* v, int i);
 lval* lval_pop(lval* v, int i);
 lval* builtin_op(lval* a, char* op);
+lval* builtin(lval* a, char* func);
 
 /* possible errors*/
 // enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
@@ -225,7 +226,7 @@ lval* lval_eval_sexpr(lval* v) {
     }
 
     /* Call builtin with operator */
-    lval* result = builtin_op(v, f->sym);
+    lval* result = builtin(v, f->sym);
     lval_del(f);
     return result;
 }
