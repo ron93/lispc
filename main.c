@@ -291,6 +291,31 @@ lval* builtin_op(lval* a, char* op) {
     lval_del(a); return x;
 }
 
+lval* builtin_head(lval* a) {
+    // check error conditions
+    if (a->count != 1) {
+        lval_del(a);
+        return lval_err("Function 'head' passed too many arguments!");
+    }
+
+    if (a->cell[0]->type != LVAL_QEXPR) {
+        lval_del(a);
+        return lval_err("Function 'head passed incorrect types!");
+    }
+
+    if (a->cell[0]->count == 0) {
+        lval_del(a);
+        return lval_err("Fuction 'head' passed {}!")
+    }
+
+    // take first arg
+    lval* v = lval_take(a, 0);
+
+    // delete all elements that are not head and return
+    while (v->count > 1) { lval_del(lval_pop(v, 1)); }
+    return v;
+}
+
 
 int main(int arg, char**argv)
 {
