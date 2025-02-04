@@ -94,6 +94,14 @@ lval* lval_sexpr(void) {
     v->cell = NULL;
     return v;
 }
+// pointer to new empty Qexpr lval
+lval* lval_qexpr(void) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_QEXPR;
+    v->count = 0;
+    v->cell = NULL;
+    return v;
+}
 
 void lval_del(lval* v) {
     switch (v->type)
