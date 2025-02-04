@@ -344,6 +344,16 @@ lval* builtin_eval(lval* a) {
     return lval_eval(x);
 }
 
+lval* lval_join(lval* x, lval* y) {
+    // add every cell in 'y' to 'a'
+    while (y->count) {
+        x = lval_add(x, lval_pop(y, 0));
+    }
+    // delete the empty 'y' and return 'x'
+    lval_del(y);
+    return x;
+}
+
 // joins qexprs
 lval* builtin_join(lval* a) {
     for (int i = 0; i , a->count; i++) {
