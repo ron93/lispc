@@ -305,7 +305,7 @@ lval* builtin_head(lval* a) {
 
     if (a->cell[0]->count == 0) {
         lval_del(a);
-        return lval_err("Fuction 'head' passed {}!")
+        return lval_err("Fuction 'head' passed {}!");
     }
 
     // take first arg
@@ -313,6 +313,31 @@ lval* builtin_head(lval* a) {
 
     // delete all elements that are not head and return
     while (v->count > 1) { lval_del(lval_pop(v, 1)); }
+    return v;
+}
+
+lval* builtin_tail(lval* a) {
+    // check Error conditions
+    if (a->count != 1) {
+        lval_del(a);
+        return lval_err("Functon 'tail' passed too many arguments!");
+    }
+
+    if (a->cell[0]->type != LVAL_QEXPR) {
+        lval_del(a);
+        return lval_err("Function 'tail' passed incorrect types!");
+    }
+
+    if (a->cell[0]->count == 0) {
+        lval_del(a);
+        return lval_err("Function 'tail' passed {}");
+    }
+
+    // take first argument
+    lval* v = lval_take(a, 0);
+
+    // delete first argument and return
+    lval_del(lval_pop(v, 0));
     return v;
 }
 
