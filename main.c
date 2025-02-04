@@ -5,7 +5,7 @@
 #define LASSERT(args, cond, err) \
     if(!(cond)) { lval_del(args); return lval_err(err); }
 
-    
+
 /* compile this functions if on  windows*/
 #ifdef _WIN32
 #include <string.h>
@@ -298,20 +298,11 @@ lval* builtin_op(lval* a, char* op) {
 
 lval* builtin_head(lval* a) {
     // check error conditions
-    if (a->count != 1) {
-        lval_del(a);
-        return lval_err("Function 'head' passed too many arguments!");
-    }
+    LASSERT(a, a->count == 1, "Function 'head' passed too many arguments!");
 
-    if (a->cell[0]->type != LVAL_QEXPR) {
-        lval_del(a);
-        return lval_err("Function 'head passed incorrect types!");
-    }
+    LASSERT(a, a->cell[0]->type != LVAL_QEXPR, "Function 'head passed incorrect types!");
 
-    if (a->cell[0]->count == 0) {
-        lval_del(a);
-        return lval_err("Fuction 'head' passed {}!");
-    }
+    LASSERT(a, a->cell[0]->count == 0,"Function 'head' passed {}!");
 
     // take first arg
     lval* v = lval_take(a, 0);
