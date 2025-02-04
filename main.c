@@ -304,13 +304,14 @@ int main(int arg, char**argv)
 
     /* define language*/
     mpca_lang(MPCA_LANG_DEFAULT, 
-        "                                            \
-            number : /-?[0-9]+/ ;                    \
-            symbol : '+' | '-' | '*' | '/' ;         \
-            sexpr  : '(' <expr>* ')' ;               \
-            qexpr  : '{' <expr>* '}' ;             \
-            expr   : <number> | <symbol> | <sexpr> | <qexpr> ; \
-            lispc  : /^/ <expr>* /$/ ;               \
+        "                                                                   \
+            number : /-?[0-9]+/ ;                                           \
+            symbol : \"list\" | \"head\" | \"tail\"                         \  
+                    | \"join\" | \"eval\" | '+' | '-' | '*' | '/' ;         \
+            sexpr  : '(' <expr>* ')' ;                                      \
+            qexpr  : '{' <expr>* '}' ;                                      \
+            expr   : <number> | <symbol> | <sexpr> | <qexpr> ;              \
+            lispc  : /^/ <expr>* /$/ ;                                      \
         ",
         Number, Symbol, Sexpr, Qexpr, Expr, Lispc);
 
