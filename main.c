@@ -292,6 +292,13 @@ lval* builtin_op(lval* a, char* op) {
             }
             x->num /= y->num;
          }
+         if (strcmp(op, "%") == 0) {
+            if (y->num == 0) {
+                lval_del(x); lval_del(y);
+                x = lval_err("Division by zero!"); break;
+            }
+            x->num %= y->num;
+         }
          lval_del(y);
     }
     lval_del(a); return x;
@@ -398,7 +405,7 @@ int main(int arg, char**argv)
         "                                                                   \
             number : /-?[0-9]+/ ;                                           \
             symbol : \"list\" | \"head\" | \"tail\"                         \  
-                    | \"join\" | \"eval\" | '+' | '-' | '*' | '/' ;         \
+                    | \"join\" | \"eval\" | '+' | '-' | '*' | '/' | '%' ;         \
             sexpr  : '(' <expr>* ')' ;                                      \
             qexpr  : '{' <expr>* '}' ;                                      \
             expr   : <number> | <symbol> | <sexpr> | <qexpr> ;              \
