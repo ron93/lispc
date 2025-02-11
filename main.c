@@ -265,7 +265,7 @@ lval* builtin_op(lval* a, char* op) {
     for (int i = 0; i < a->count; i++) {
         if (a->cell[i]->type != LVAL_NUM) {
             lval_del(a);
-            return lval_err("Cannot operate on no-number!");
+            return lval_err("Cannot operate on non-number!");
         }
     }
 
@@ -385,7 +385,7 @@ lval* builtin(lval* a, char* func) {
     if (strcmp("tail", func) == 0) { return builtin_tail(a); }
     if (strcmp("join", func) == 0) { return builtin_join(a); }
     if (strcmp("eval", func) == 0) { return builtin_eval(a); }
-    if (strcmp("+-/*", func)) { return builtin_op(a, func); }
+    if (strstr("+-/*%", func)) { return builtin_op(a, func); }
     lval_del(a);
     return lval_err("Unknown Function");
 }
@@ -404,8 +404,7 @@ int main(int arg, char**argv)
     mpca_lang(MPCA_LANG_DEFAULT, 
         "                                                                   \
             number : /-?[0-9]+/ ;                                           \
-            symbol : \"list\" | \"head\" | \"tail\"                         \  
-                    | \"join\" | \"eval\" | '+' | '-' | '*' | '/' | '%' ;         \
+            symbol : /[a-zA-Z0-9_+%\\-*\\/\\\\=<>!&]+/;   \
             sexpr  : '(' <expr>* ')' ;                                      \
             qexpr  : '{' <expr>* '}' ;                                      \
             expr   : <number> | <symbol> | <sexpr> | <qexpr> ;              \
