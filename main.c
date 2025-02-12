@@ -116,6 +116,14 @@ lval* lval_qexpr(void) {
     v->cell = NULL;
     return v;
 }
+// function constructor
+lval* lval_fun(lbuiltin func) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_FUN;
+    v->fun = func;
+    return v;
+}
+
 
 lval* lval_read_num(mpc_ast_t* t) {
     errno = 0;
