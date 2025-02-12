@@ -33,6 +33,26 @@ void add_history(char* unused) {}
 #include <editline/history.h>
 #endif
 
+// foward declaration
+struct lval;
+struct lenv;
+typedef struct lval lval;
+typedef struct lenv lenv;
+void lval_print(lval* v);
+lval* lval_add(lval* v, lval* x);
+lval* lval_eval(lval* v);
+lval* lval_take(lval* v, int i);
+lval* lval_pop(lval* v, int i);
+lval* builtin_op(lval* a, char* op);
+lval* builtin(lval* a, char* func);
+
+/* possible lval types*/
+enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_FUN, LVAL_SEXPR, LVAL_QEXPR };
+
+
+typedef lval*(*lbuiltin)(lenv*, lval*);
+
+
 /* to fix pointer or reference to incomplete type "struct lval" is not allowed
 */
 // typedef struct cell;
@@ -44,25 +64,13 @@ typedef struct lval
     /* error and symbol have string data*/
     char* err;
     char* sym;
+    lbuiltin fun;
     /* count */
     int count;
     /* Pointer to a list of "lval*" -> converted from 'struct lval** cell' type declaration*/
     struct lval** cell;
 } lval;
 
-
-
-/* possible lval types*/
-enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR };
-
-// foward declaration
-void lval_print(lval* v);
-lval* lval_add(lval* v, lval* x);
-lval* lval_eval(lval* v);
-lval* lval_take(lval* v, int i);
-lval* lval_pop(lval* v, int i);
-lval* builtin_op(lval* a, char* op);
-lval* builtin(lval* a, char* func);
 
 /* possible errors*/
 // enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
