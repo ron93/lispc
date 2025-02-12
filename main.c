@@ -465,6 +465,20 @@ void lenv_del(lenv* e) {
     free(e);
 }
 
+// get value from env
+lval* lenv_get(lenv* e, lval* k) {
+    // iterate over items in environment
+    for (int i = 0; i < e->count; i++) {
+        // check if stored symbol matches the symbol string
+        // if match, return the copy.
+        if (strcmp(e->syms[i], k->sym) == 0) {
+            return lval_copy(e->vals[i]);
+        }
+    }
+    // if non found return error
+    return lval_err("unbound symbol");
+}
+
 int main(int arg, char**argv)
 {
     /* Parsers*/
