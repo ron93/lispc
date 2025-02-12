@@ -455,6 +455,16 @@ lenv* lenv_new(void) {
     return e;
 }
 
+void lenv_del(lenv* e) {
+    for (int i = 0; i < e->count; i++) {
+        free(e->syms[i]);
+        lval_del(e->vals[i]);
+    }
+    free(e->syms);
+    free(e->vals);
+    free(e);
+}
+
 int main(int arg, char**argv)
 {
     /* Parsers*/
