@@ -77,6 +77,13 @@ struct lenv {
     lval** vals;
 };
 
+// function constructor
+lval* lval_fun(lbuiltin func) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_FUN;
+    v->fun = func;
+    return v;
+}
 /* possible errors*/
 // enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
 
@@ -217,10 +224,10 @@ void lval_print(lval* v) {
 /* print lval followed by a newline */
 void lval_println(lval* v) { lval_print(v); putchar('\n');}
 
-lval* lval_eval_sexpr(lval* v) {
+lval* lval_eval_sexpr(lenv* e, lval* v) {
     /* evaluate children */
     for (int i = 0; i < v->count; i++) {
-        v->cell[i] = lval_eval(v->cell[i]);
+        v->cell[i] = lval_eval(e, v->cell[i]);
     }
     /* error check */
     for (int i = 0; i < v->count; i++) {
@@ -235,20 +242,25 @@ lval* lval_eval_sexpr(lval* v) {
 
     /* Ensure first element is a Symbol */
     lval* f = lval_pop(v, 0);
-    if (f->type != LVAL_SYM) {
+    if (f->type != LVAL_FUN) {
         lval_del(f); lval_del(v);
         return lval_err("S-expression Does not start with symbol!");
     }
 
     /* Call builtin with operator */
-    lval* result = builtin(v, f->sym);
+    lval* result = f->fun(e, v);
     lval_del(f);
     return result;
 }
 
-lval* lval_eval(lval* v) {
+lval* lval_eval(lenv* e, lval* v) {
+    if (v->type == LVAL_SYM) {
+        lval* x = lenv_get(e, v);
+        lval_del(v);
+        return x;
+    }
     /* evaluate Sexpression */
-    if (v->type == LVAL_SEXPR) { return lval_eval_sexpr(v); }
+    if (v->type == LVAL_SEXPR) { return lval_eval_sexpr(e, v); }
 
     /* all other lval types remain the same */
     return v;
@@ -438,14 +450,6 @@ lval* lval_copy(lval* v) {
 }
 
 /*lenv logic */
-// function constructor
-lval* lval_fun(lbuiltin func) {
-    lval* v = malloc(sizeof(lval));
-    v->type = LVAL_FUN;
-    v->fun = func;
-    return v;
-}
-
 // lenv constructor
 lenv* lenv_new(void) {
     lenv* e = malloc(sizeof(lenv));
