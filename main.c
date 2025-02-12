@@ -67,10 +67,15 @@ typedef struct lval
     lbuiltin fun;
     /* count */
     int count;
-    /* Pointer to a list of "lval*" -> converted from 'struct lval** cell' type declaration*/
-    struct lval** cell;
+    lval** cell;
 } lval;
 
+// lenv struct
+struct lenv {
+    int count;
+    char** syms;
+    lval** vals;
+};
 
 /* possible errors*/
 // enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM};
@@ -413,7 +418,7 @@ lval* lval_copy(lval* v) {
     x->type = v->type;
     
     switch (v->type) {
-    // copy directly - forf Numbers and Functions
+    // copy directly -> for Numbers and Functions
     case LVAL_FUN: x->fun = v->fun; break;
     case LVAL_NUM: x->num = v->num; break;
     
