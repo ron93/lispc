@@ -121,13 +121,6 @@ lval* lval_qexpr(void) {
     v->cell = NULL;
     return v;
 }
-// function constructor
-lval* lval_fun(lbuiltin func) {
-    lval* v = malloc(sizeof(lval));
-    v->type = LVAL_FUN;
-    v->fun = func;
-    return v;
-}
 
 
 lval* lval_read_num(mpc_ast_t* t) {
@@ -442,6 +435,24 @@ lval* lval_copy(lval* v) {
     break;
     }
     return x;
+}
+
+/*lenv logic */
+// function constructor
+lval* lval_fun(lbuiltin func) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_FUN;
+    v->fun = func;
+    return v;
+}
+
+// lenv constructor
+lenv* lenv_new(void) {
+    lenv* e = malloc(sizeof(lenv));
+    e->count = 0;
+    e->syms = NULL;
+    e->vals = NULL;
+    return e;
 }
 
 int main(int arg, char**argv)
