@@ -186,7 +186,7 @@ void lval_del(lval* v) {
         /* free string -> Err and Sym*/
         case LVAL_ERR: free(v->err); break;
         case LVAL_SYM: free(v->sym); break;
-
+        case LVAL_FUN: break;
         /* Sexpr and Qexpr handling ->delete if either*/
         case LVAL_QEXPR:
         case LVAL_SEXPR:
